@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'modules.city_tales',
+    'modules.city_routes',
+    'django.contrib.gis',
+    'modules.gov_connect',
+    'django.contrib.gis',
 ]
 
 MIDDLEWARE = [
@@ -115,6 +120,33 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CITY_TALES_CONFIG = {
+    'QR_CODE_SIZE': 300,
+    'AUDIO_MAX_DURATION': 300,  # секунд
+    'DEFAULT_LOCATION': '40.5200,72.8000'  # Координаты Баткена
+}
+
+CITY_ROUTES_CONFIG = {
+    'DEFAULT_MAP_PROVIDER': 'osm',
+    'SMS_ENABLED': True,
+    'MAX_ROUTE_POINTS': 100,
+    'VEHICLE_UPDATE_INTERVAL': 30  # seconds
+}
+
+GOV_CONNECT_CONFIG = {
+    'DEFAULT_DEPARTMENTS': [
+        'road_services',
+        'utilities',
+        'emergency'
+    ],
+    'AUTO_ASSIGN_COMPLAINTS': True,
+    'NOTIFICATION_METHODS': ['email', 'sms'],
+    'MAX_COMPLAINT_PHOTO_SIZE': 5  # MB
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
