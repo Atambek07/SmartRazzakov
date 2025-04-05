@@ -1,28 +1,22 @@
-import requests
-from django.conf import settings
+from ..domain.entities import RouteOptimization
 
 
-class SMSNotifier:
-    def __init__(self):
-        self.api_url = settings.SMS_GATEWAY_URL
-        self.api_key = settings.SMS_API_KEY
+class GetRouteUseCase:
+    def __init__(self, repository):
+        self.repo = repository
 
-    def send_route_info(self, phone: str, route_info: dict) -> bool:
-        """Отправляет информацию о маршруте через SMS"""
-        text = (
-            f"Маршрут {route_info['number']}:\n"
-            f"Остановки: {route_info['stops']}\n"
-            f"Время прибытия: {route_info['arrival_time']}"
-        )
+    def execute(self, start: str, end: str, optimization: str) -> 'TransportRoute':
+        """Возвращает оптимальный маршрут"""
+        routes = self.repo.get_available_routes(start, end)
 
-        response = requests.post(
-            self.api_url,
-            json={
-                "phone": phone,
-                "text": text,
-                "sender": "SmartRazakov"
-            },
-            headers={"Authorization": f"Bearer {self.api_key}"}
-        )
+        if not routes:
+            raise ValueError("Нет доступных маршрутов")
 
-        return response.status_code == 200
+        optimization = RouteOptimization(optimization.lower())
+
+        if optimization == RouteOptimization.FASTEST:
+            return min(routes, key=lambda r: r.estimated_time)
+        elif optimization == RouteOptimization.CHEAPEST:
+            return min(routes, key=lambda r: r.price)
+        else:  # ECO
+            return min(routes, key=lambda r: r.eco_score)

@@ -1,12 +1,9 @@
 from django.urls import path
-from .presentation.views import (
-    PublicTransportAPI,
-    VehicleLocationAPI,
-    SMSRouteInfoAPI
-)
+from .views import RouteAPIView, VehicleLocationAPIView
 
 urlpatterns = [
-    path('plan-route/', PublicTransportAPI.as_view(), name='plan-route'),
-    path('vehicle/<int:vehicle_id>/', VehicleLocationAPI.as_view(), name='vehicle-location'),
-    path('sms/route-info/', SMSRouteInfoAPI.as_view(), name='sms-route-info'),
+    path('routes/', RouteAPIView.as_view(), name='route-finder'),
+    path('vehicles/<int:vehicle_id>/',
+         VehicleLocationAPIView.as_view(),
+         name='vehicle-location'),
 ]

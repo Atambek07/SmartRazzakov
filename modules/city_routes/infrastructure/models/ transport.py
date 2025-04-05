@@ -14,13 +14,20 @@ class TransportVehicle(models.Model):
     vehicle_type = models.CharField(max_length=10, choices=VEHICLE_TYPES)
     current_location = gis_models.PointField()
     last_update = models.DateTimeField(auto_now=True)
-    capacity = models.IntegerField(default=30)
     route = models.ForeignKey('TransportRoute', on_delete=models.CASCADE)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['vehicle_type']),
+            models.Index(fields=['number']),
+        ]
 
 
 class TransportRoute(models.Model):
-    number = models.CharField(max_length=10)
-    stops = gis_models.LineStringField()
-    schedule = models.JSONField()  # {weekdays: [], weekends: []}
+    number = models.CharField(max_length=10, unique=True)
+    stops = gis_models.LineStringField()  # Маршрут как линия на карте
+    schedule = models.JSONField()  # {"weekdays": [...], "weekends": [...]}
     price = models.DecimalField(max_digits=6, decimal_places=2)
-    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Маршрут {self.number}"

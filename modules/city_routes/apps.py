@@ -6,5 +6,5 @@ class CityRoutesConfig(AppConfig):
     name = 'modules.city_routes'
 
     def ready(self):
-        from .tasks import update_vehicle_locations
-        from .signals import process_traffic_data
+        from . import signals  # Импорт сигналов
+        from .tasks import update_vehicle_locations  # Фоновые задачи
