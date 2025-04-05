@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'modules.gov_connect',
     'django.contrib.gis',
+    'modules.community_hub',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -146,6 +148,13 @@ GOV_CONNECT_CONFIG = {
     'AUTO_ASSIGN_COMPLAINTS': True,
     'NOTIFICATION_METHODS': ['email', 'sms'],
     'MAX_COMPLAINT_PHOTO_SIZE': 5  # MB
+}
+
+COMMUNITY_HUB_CONFIG = {
+    'MAX_MEMBERS_PER_COMMUNITY': 5000,
+    'DEFAULT_REPUTATION_GAIN': 1,
+    'REALTIME_CHAT_ENABLED': True,
+    'MODERATION_REQUIRED': False
 }
 
 # Default primary key field type
