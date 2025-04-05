@@ -1,4 +1,4 @@
-#!/home/atambek-abdisalamov/SmartRazzakov/venv/bin/python3.12
+#!/home/atambek-abdisalamov/config/venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys
