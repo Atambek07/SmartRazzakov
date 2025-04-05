@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'channels',
     'modules.feedback',
     'modules.hot_news',
+    'modules.community_hub',
 
 ]
 
@@ -176,6 +177,27 @@ HOT_NEWS_CONFIG = {
     'EMERGENCY_ALERT_THRESHOLD': 'high',
     'AUTO_VERIFY_SOURCES': ['government.kg'],
     'DEFAULT_TIMEZONE': 'Asia/Bishkek'
+}
+
+HEALTH_CONNECT_CONFIG = {
+    'EMERGENCY_RESPONSE_TIME': 5,  # минут
+    'VIDEO_CONSULTATION': True,
+    'ALLOWED_FILE_TYPES': ['pdf', 'dicom', 'jpg'],
+    'DATA_RETENTION_YEARS': 10,
+    'HL7_INTEGRATION': {
+        'ENABLED': True,
+        'ENDPOINT': 'hl7://hospital:5000'
+    }
+}
+
+# settings.py
+MADE_IN_BATKEN_CONFIG = {
+    'MIN_GROUP_PURCHASE': 10,
+    'MAX_AUCTION_DURATION_DAYS': 7,
+    'COMMISSION_RATE': 0.05,
+    'ALLOWED_SELLER_TYPES': ['individual', 'legal_entity'],
+    'DELIVERY_OPTIONS': ['courier', 'pickup'],
+    'LOCAL_CURRENCY': 'KGS'
 }
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
