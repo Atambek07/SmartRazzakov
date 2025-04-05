@@ -42,8 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'modules.gov_connect',
     'django.contrib.gis',
-    'modules.community_hub',
+    'modules.feedback',
     'channels',
+    'modules.feedback',
+    'modules.hot_news',
+
 ]
 
 MIDDLEWARE = [
@@ -157,6 +160,23 @@ COMMUNITY_HUB_CONFIG = {
     'MODERATION_REQUIRED': False
 }
 
+FEEDBACK_CONFIG = {
+    'MIN_REVIEW_LENGTH': 20,
+    'MAX_REVIEW_LENGTH': 2000,
+    'PROFANITY_FILTER': True,
+    'AUTO_APPROVE_THRESHOLD': 4,  # Автоодобрение отзывов с рейтингом >=4
+    'RATING_UPDATE_INTERVAL': 3600  # Обновление рейтингов каждый час
+}
+
+HOT_NEWS_CONFIG = {
+    'RSS_FEEDS': [
+        'https://example.com/news/rss',
+        'https://government.kg/feed'
+    ],
+    'EMERGENCY_ALERT_THRESHOLD': 'high',
+    'AUTO_VERIFY_SOURCES': ['government.kg'],
+    'DEFAULT_TIMEZONE': 'Asia/Bishkek'
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
