@@ -1,26 +1,28 @@
-from ..domain.entities import RouteOptimization
-from ..domain.services import RouteCalculator
+from typing import Literal
+from domain.entities import TransportRoute
 
 
 class RouteFinderUseCase:
-    def __init__(self, route_calculator: RouteCalculator):
-        self.calculator = route_calculator
+    def execute(self,
+                start: tuple[float, float],
+                end: tuple[float, float],
+                optimization: Literal['fastest', 'cheapest', 'eco']) -> TransportRoute:
+        """Основной сценарий поиска маршрута"""
+        routes = self.repository.get_available_routes(start, end)
 
-    def find_optimal_route(self, start: Tuple[float, float],
-                           end: Tuple[float, float],
-                           optimization: RouteOptimization) -> dict:
-        routes = self.calculator.get_available_routes(start, end)
+        if not routes:
+            raise ValueError("Нет доступных маршрутов")
 
-        if optimization == RouteOptimization.FASTEST:
-            best_route = min(routes, key=lambda x: x.estimated_time)
-        elif optimization == RouteOptimization.CHEAPEST:
-            best_route = min(routes, key=lambda x: x.price)
-        else:  # ECO
-            best_route = min(routes, key=lambda x: x.eco_score)
+        if optimization == 'fastest':
+            return min(routes, key=lambda r: r.estimated_time)
+        elif optimization == 'cheapest':
+            return min(routes, key=lambda r: r.price)
+        else:  # eco
+            return self._find_most_eco_route(routes)
 
-        return {
-            'route_number': best_route.number,
-            'stops': best_route.stops,
-            'estimated_time': best_route.estimated_time,
-            'price': best_route.price
-        }
+    def _find_most_eco_route(self, routes: list[TransportRoute]) -> TransportRoute:
+        """Находит самый экологичный маршрут (примерная реализация)"""
+        return sorted(
+            routes,
+            key=lambda r: {'bus': 3, 'tram': 1, 'trolley': 2, 'minibus': 4}[r.transport_type]
+        )[0]
