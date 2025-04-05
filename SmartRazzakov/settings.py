@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'modules.feedback',
     'modules.hot_news',
     'modules.community_hub',
+    'modules.city_routes',
+    'django.contrib.gis',
+
 
 ]
 
@@ -85,10 +88,15 @@ WSGI_APPLICATION = 's1.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'smartrazzakov_db',
+        'USER': 'atambek',
+        'PASSWORD': 'atambek12',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
@@ -198,6 +206,29 @@ MADE_IN_BATKEN_CONFIG = {
     'ALLOWED_SELLER_TYPES': ['individual', 'legal_entity'],
     'DELIVERY_OPTIONS': ['courier', 'pickup'],
     'LOCAL_CURRENCY': 'KGS'
+}
+
+CITY_ROUTES = {
+    'MAP_PROVIDER': 'osm',  # OpenStreetMap
+    'MAX_ROUTE_POINTS': 100,
+    'REALTIME_UPDATE_INTERVAL': 30,  # секунд
+}
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/cityroutes.log',
+        },
+    },
+    'loggers': {
+        'cityroutes': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+    },
 }
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

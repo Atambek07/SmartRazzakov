@@ -1,6 +1,6 @@
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
-from typing import List, Optional
 
 class TransportType(Enum):
     BUS = "bus"
@@ -18,6 +18,6 @@ class TransportRoute:
     id: str
     transport_type: TransportType
     number: str
-    stops: List[str]  # List of stop IDs
-    schedule: dict    # { "weekdays": [...], "weekends": [...] }
-    current_location: Optional[str] = None  # GPS coordinates
+    stops: list[str]  # Список ID остановок
+    schedule: dict  # {"weekdays": [...], "weekends": [...]}
+    current_location: tuple[float, float] | None = None  # (lat, lng)
