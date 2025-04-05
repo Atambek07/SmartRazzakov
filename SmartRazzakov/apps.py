@@ -35,3 +35,13 @@ class GovConnectConfig(AppConfig):
     def ready(self):
         from . import signals  # Импорт сигналов
         from .tasks import process_pending_complaints
+
+
+class CommunityHubConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'modules.community_hub'
+
+    def ready(self):
+        # Импорт сигналов и задач
+        from . import signals
+        from .tasks import update_community_stats
