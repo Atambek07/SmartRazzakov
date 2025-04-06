@@ -46,3 +46,7 @@ class StatusModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class BaseModel:
+    pass

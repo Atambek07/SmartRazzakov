@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'modules.community_hub',
     'modules.city_routes',
     'django.contrib.gis',
-    'rest_framework'
+    'rest_framework',
 
 
 ]
@@ -64,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 's1.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
