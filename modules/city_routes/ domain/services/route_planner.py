@@ -1,17 +1,25 @@
-from ..entities import TransportRoute, RouteOptimization
+from abc import ABC, abstractmethod
+from ..entities import Route
+from ..exceptions import InvalidCoordinatesError
 
 
-class RoutePlanner:
-    def __init__(self, map_provider):
-        self.map_provider = map_provider
+class RoutePlanner(ABC):
+    """Абстрактный сервис для построения маршрутов."""
 
-    def plan_route(self, start: str, end: str, optimization: RouteOptimization) -> TransportRoute:
-        """Планирует маршрут с учетом выбранной оптимизации"""
-        routes = self.map_provider.get_available_routes(start, end)
+    @abstractmethod
+    def find_optimal_route(self, start: str, end: str, mode: str = "driving") -> Route:
+        """
+        Находит оптимальный маршрут между точками.
 
-        if optimization == RouteOptimization.FASTEST:
-            return min(routes, key=lambda r: r.estimated_time)
-        elif optimization == RouteOptimization.CHEAPEST:
-            return min(routes, key=lambda r: r.price)
-        else:  # ECO
-            return min(routes, key=lambda r: r.carbon_footprint)
+        :param start: Координаты начальной точки (формат: "lat,lng").
+        :param end: Координаты конечной точки.
+        :param mode: Тип маршрута ("driving", "walking", "public").
+        :return: Объект Route.
+        :raises InvalidCoordinatesError: Если координаты некорректны.
+        """
+        pass
+
+    @abstractmethod
+    def calculate_distance(self, point1: str, point2: str) -> float:
+        """Вычисляет расстояние между двумя точками в км."""
+        pass
