@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+import venv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -89,15 +90,21 @@ WSGI_APPLICATION = 's1.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'smartrazzakov_db',
-        'USER': 'atambek',
-        'PASSWORD': 'atambek12',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': venv('DB_NAME'),
+        'USER': venv('DB_USER'),
+        'PASSWORD': venv('DB_PASSWORD'),
+        'HOST': venv('DB_HOST', default='localhost'),
+        'PORT': venv('DB_PORT', default='5432'),
+        'OPTIONS': {
+            'connect_timeout': 5,  # 5 seconds timeout
+            'sslmode': venv('DB_SSL_MODE', default='prefer'),
+            'application_name': 'smartcity_backend',
+        },
+        'CONN_MAX_AGE': 600,  # Persistent connections
+        'DISABLE_SERVER_SIDE_CURSORS': False,  # For large GIS datasets
     }
 }
-
 
 
 # Password validation
@@ -140,13 +147,68 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+    # Authentication
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # OAuth2
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT
+        'rest_framework.authentication.SessionAuthentication',  # Browser UI
     ],
+
+    # Permission Policies
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+
+    # Request Handling
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',  # For file uploads
+    ],
+
+    # Response Formatting
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        'core.api.renderers.BrowsableAPIRendererNoForms',  # Custom UI renderer
     ],
+
+    # Filtering & Search
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+
+    # Pagination
+    'DEFAULT_PAGINATION_CLASS': 'core.api.pagination.StandardResultsSetPagination',
+    'PAGE_SIZE': 50,
+
+    # Throttling (Rate Limiting)
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'core.api.throttling.BurstRateThrottle',  # Custom
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',
+        'user': '1000/hour',
+        'burst': '60/minute',  # For emergency APIs
+    },
+
+    # Versioning
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'ALLOWED_VERSIONS': ['v1', 'v2'],
+
+    # Schema Generation
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+    # Exception Handling
+    'EXCEPTION_HANDLER': 'core.api.exceptions.custom_exception_handler',
+
+    # Datetime Formatting
+    'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%S%z',
+    'DATE_FORMAT': '%Y-%m-%d',
+    'TIME_FORMAT': '%H:%M:%S',
 }
 
 CITY_TALES_CONFIG = {
