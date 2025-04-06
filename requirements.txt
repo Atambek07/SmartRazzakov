@@ -1,5 +1,5 @@
 Django~=4.2.11
-pip~=24.0
+pip~=25.0
 attrs~=23.2.0
 distro~=1.9.0
 wheel~=0.42.0
@@ -29,7 +29,7 @@ shapely==2.0.2  # Geometry operations
 ### API Development [REST]
 #######################################
 drf-spectacular==0.27.1  # Modern OpenAPI docs
-djangorestframework-simplejwt==5.3.0  # JWT auth
+djangorestframework-simplejwt==5.4.0  # JWT auth
 django-cors-headers==4.3.1  # CORS management
 django-filter==23.5  # Dynamic filtering
 
@@ -79,7 +79,7 @@ python-qrcode==7.4.2  # QR generation
 #######################################
 ### System Dependencies [SYS]
 #######################################
-gunicorn==21.2.0  # Production WSGI
+gunicorn==23.0.0  # Production WSGI
 uvicorn==0.25.0  # ASGI server
 whitenoise==6.6.0  # Static files
 
@@ -87,8 +87,8 @@ whitenoise==6.6.0  # Static files
 ### OAuth 2.0 & Social Authentication
 #######################################
 # Core OAuth
-authlib==1.2.1  # RFC-compliant OAuth library
-python-jose==3.3.0  # JWT encoding/decoding
+authlib==1.3.1  # RFC-compliant OAuth library
+python-jose==3.4.0  # JWT encoding/decoding
 oauthlib==3.2.2  # OAuth protocol implementation
 
 # Django OAuth Toolkit (for API providers)
@@ -96,7 +96,7 @@ django-oauth-toolkit==2.3.0  # OAuth2 provider
 django-cors-middleware==1.5.1  # For CORS in OAuth flows
 
 # Social Auth (3rd party logins)
-social-auth-app-django==5.2.0  # 50+ providers
+social-auth-app-django==5.4.1  # 50+ providers
 social-auth-core==4.5.0  # Base functionality
 
 # Specific Providers

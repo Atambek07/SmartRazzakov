@@ -1,21 +1,45 @@
 from abc import ABC, abstractmethod
-
+from typing import Dict, List
+from ..entities import UserPreferences
+from ..exceptions import NotificationFailedError
 
 class SMSService(ABC):
-    """Абстрактный сервис для отправки SMS."""
-
+    """Абстрактный сервис отправки SMS-уведомлений"""
+    
     @abstractmethod
-    def send_sms(self, phone: str, message: str) -> bool:
+    async def send(
+        self,
+        phone_number: str,
+        message: str,
+        user_prefs: Optional[UserPreferences] = None
+    ) -> bool:
         """
-        Отправляет SMS пользователю.
-
-        :param phone: Номер телефона (формат: "+996XXXXXXXXX").
-        :param message: Текст сообщения.
-        :return: True, если отправка успешна.
+        Отправляет SMS сообщение
+        Args:
+            phone_number: номер телефона получателя
+            message: текст сообщения
+            user_prefs: предпочтения пользователя для персонализации
+        Returns:
+            True если отправка успешна
+        Raises:
+            NotificationFailedError: если отправка не удалась
         """
         pass
 
     @abstractmethod
-    def format_route_message(self, route) -> str:
-        """Форматирует данные маршрута для SMS."""
+    async def broadcast(
+        self,
+        recipients: List[str],
+        message_template: str,
+        context: Dict
+    ) -> int:
+        """
+        Массовая рассылка сообщений
+        Args:
+            recipients: список номеров телефонов
+            message_template: шаблон сообщения (например, "Маршрут {route_id} изменен")
+            context: данные для подстановки в шаблон
+        Returns:
+            Количество успешно отправленных сообщений
+        """
         pass

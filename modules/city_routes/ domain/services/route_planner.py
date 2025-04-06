@@ -1,25 +1,38 @@
 from abc import ABC, abstractmethod
-from ..entities import Route
-from ..exceptions import InvalidCoordinatesError
-
+from typing import List, Tuple, Optional
+from ..entities import Route, TransportType
+from ..exceptions import RouteOptimizationError
 
 class RoutePlanner(ABC):
-    """Абстрактный сервис для построения маршрутов."""
-
+    """Абстрактный сервис для построения маршрутов"""
+    
     @abstractmethod
-    def find_optimal_route(self, start: str, end: str, mode: str = "driving") -> Route:
+    async def calculate_route(
+        self,
+        start: Tuple[float, float],
+        end: Tuple[float, float],
+        transport_type: TransportType,
+        options: Optional[dict] = None
+    ) -> Route:
         """
-        Находит оптимальный маршрут между точками.
-
-        :param start: Координаты начальной точки (формат: "lat,lng").
-        :param end: Координаты конечной точки.
-        :param mode: Тип маршрута ("driving", "walking", "public").
-        :return: Объект Route.
-        :raises InvalidCoordinatesError: Если координаты некорректны.
+        Рассчитывает оптимальный маршрут между точками
+        Args:
+            start: (latitude, longitude) начальной точки
+            end: (latitude, longitude) конечной точки
+            transport_type: тип транспорта
+            options: дополнительные параметры (avoid_tolls, wheelchair_accessible и т.д.)
+        Returns:
+            Объект Route с рассчитанным маршрутом
+        Raises:
+            RouteOptimizationError: если не удалось построить маршрут
         """
         pass
 
     @abstractmethod
-    def calculate_distance(self, point1: str, point2: str) -> float:
-        """Вычисляет расстояние между двумя точками в км."""
+    async def estimate_duration(
+        self,
+        route: Route,
+        traffic_conditions: Optional[dict] = None
+    ) -> float:
+        """Оценивает время прохождения маршрута в минутах"""
         pass

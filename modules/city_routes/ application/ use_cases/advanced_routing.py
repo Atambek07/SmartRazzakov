@@ -1,35 +1,28 @@
-from ..domain.entities import RouteOptimization
-from ..domain.services import RouteCalculator
-from typing import List, Dict
+from typing import List
+from city_routes.domain.entities import Route
+from city_routes.application.dto.route_dto import RouteUpdateDTO
 
 
-class OptimizedRouteFinder:
-    def __init__(self, route_calculator: RouteCalculator):
-        self.calculator = route_calculator
+class AdvancedRoutingUseCase:
+    def __init__(self, route_optimizer, repository):
+        self.optimizer = route_optimizer
+        self.repository = repository
 
-    def execute(self, points: List[Dict], optimization: RouteOptimization) -> Dict:
-        """
-        points: [{'coords': (lat, lng), 'type': 'start|end|via'}]
-        optimization: FASTEST|CHEAPEST|ECO
-        """
-        routes = []
+    async def optimize_route(self, route_id: str, update_data: RouteUpdateDTO) -> Route:
+        route = await self.repository.get_by_id(route_id)
 
-        # Генерация всех возможных комбинаций маршрутов
-        for i in range(len(points) - 1):
-            start = points[i]['coords']
-            end = points[i + 1]['coords']
-            segment_routes = self.calculator.get_routes_between(start, end)
-            routes.append(segment_routes)
+        optimized = await self.optimizer.recalculate(
+            existing_route=route,
+            avoid_areas=update_data.avoid_areas,
+            priority=update_data.priority,
+            new_transport=update_data.new_transport
+        )
 
-        # Применение алгоритма оптимизации
-        if optimization == RouteOptimization.FASTEST:
-            return self._find_fastest_combination(routes)
-        elif optimization == RouteOptimization.CHEAPEST:
-            return self._find_cheapest_combination(routes)
-        else:
-            return self._find_eco_friendly_combination(routes)
+        return await self.repository.update(route_id, optimized)
 
-    def _find_fastest_combination(self, route_options: List[List]) -> Dict:
-        """Использует алгоритм Дейкстры для поиска самого быстрого маршрута"""
-        # ... реализация алгоритма
-        return best_route
+    async def find_alternative_routes(self, route_id: str, count: int = 3) -> List[Route]:
+        base_route = await self.repository.get_by_id(route_id)
+        return await self.optimizer.find_alternatives(
+            base_route=base_route,
+            max_alternatives=count
+        )

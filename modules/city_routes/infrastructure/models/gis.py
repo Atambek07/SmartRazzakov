@@ -1,30 +1,43 @@
 from django.contrib.gis.db import models
-from core.models.base import BaseModel
+from django.core.validators import MinValueValidator, MaxValueValidator
 
-class TrafficModel(BaseModel):
-    """Модель данных о трафике для участка маршрута."""
-    CONGESTION_LEVELS = [
-        ('low', 'Низкая'),
-        ('medium', 'Средняя'),
-        ('high', 'Высокая'),
-    ]
-
-    route = models.ForeignKey(
-        'RouteModel',
-        on_delete=models.CASCADE,
-        related_name='traffic_data'
+class Location(models.Model):
+    """
+    Модель географического местоположения с поддержкой PostGIS
+    """
+    point = models.PointField(
+        srid=4326,  # WGS84
+        verbose_name="Координаты (широта, долгота)"
     )
-    segment = models.LineStringField()  # Геометрия проблемного участка
-    congestion_level = models.CharField(
-        max_length=10,
-        choices=CONGESTION_LEVELS
+    address = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Адрес"
     )
-    average_speed_kmh = models.FloatField()  # Средняя скорость
+    city = models.CharField(
+        max_length=100,
+        default="Раззаков",
+        verbose_name="Город"
+    )
+    postal_code = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name="Почтовый индекс"
+    )
+    accuracy_m = models.FloatField(
+        validators=[MinValueValidator(0)],
+        null=True,
+        blank=True,
+        verbose_name="Точность (метры)"
+    )
 
     class Meta:
-        db_table = 'traffic'
-        verbose_name = 'Данные о трафике'
-        verbose_name_plural = 'Данные о трафике'
+        verbose_name = "Местоположение"
+        verbose_name_plural = "Местоположения"
+        indexes = [
+            models.Index(fields=['point']),
+            models.Index(fields=['city']),
+        ]
 
     def __str__(self):
-        return f"Трафик на маршруте #{self.route_id}: {self.get_congestion_level_display()}"
+        return f"{self.city}, {self.address or 'точка на карте'}"

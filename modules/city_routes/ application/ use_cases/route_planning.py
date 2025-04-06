@@ -1,22 +1,28 @@
-from ..domain.entities import RouteOptimization
+from typing import List
+from city_routes.domain.entities import RoutePlan
+from city_routes.domain.services import RouteAnalyzer
 
 
-class GetRouteUseCase:
-    def __init__(self, repository):
-        self.repo = repository
+class RoutePlanningUseCase:
+    def __init__(self, analyzer: RouteAnalyzer):
+        self.analyzer = analyzer
 
-    def execute(self, start: str, end: str, optimization: str) -> 'TransportRoute':
-        """Возвращает оптимальный маршрут"""
-        routes = self.repo.get_available_routes(start, end)
+    async def create_daily_plan(self, user_id: str, destinations: List[tuple]) -> RoutePlan:
+        analysis = await self.analyzer.analyze_destinations(destinations)
+        return RoutePlan(
+            user_id=user_id,
+            optimized_routes=analysis.optimal_order,
+            estimated_total_time=analysis.total_duration,
+            transport_mix=analysis.recommended_transport
+        )
 
-        if not routes:
-            raise ValueError("Нет доступных маршрутов")
+    async def adjust_plan_for_traffic(self, plan_id: str) -> RoutePlan:
+        current_plan = await self.plan_repo.get_by_id(plan_id)
+        traffic_data = await self.traffic_service.get_current()
 
-        optimization = RouteOptimization(optimization.lower())
+        adjusted = await self.analyzer.adjust_for_traffic(
+            original_plan=current_plan,
+            traffic_conditions=traffic_data
+        )
 
-        if optimization == RouteOptimization.FASTEST:
-            return min(routes, key=lambda r: r.estimated_time)
-        elif optimization == RouteOptimization.CHEAPEST:
-            return min(routes, key=lambda r: r.price)
-        else:  # ECO
-            return min(routes, key=lambda r: r.eco_score)
+        return await self.plan_repo.update(plan_id, adjusted)

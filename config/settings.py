@@ -30,6 +30,15 @@ ALLOWED_HOSTS = ['*']
 
 
 # Application definition
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (40.1234, 72.3456),
+    'DEFAULT_ZOOM': 13,
+    'MIN_ZOOM': 10,
+    'MAX_ZOOM': 18,
+    'RESET_VIEW': False,
+    'SCALE': 'metric',
+    'ATTRIBUTION_PREFIX': 'GIS Раззаков'
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -51,7 +60,7 @@ INSTALLED_APPS = [
     'modules.city_routes',
     'django.contrib.gis',
     'rest_framework',
-
+    'city_routes.apps.CityRoutesConfig',
 
 ]
 
@@ -70,7 +79,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'presentation/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,7 +91,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 's1.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
@@ -221,7 +230,16 @@ CITY_ROUTES_CONFIG = {
     'DEFAULT_MAP_PROVIDER': 'osm',
     'SMS_ENABLED': True,
     'MAX_ROUTE_POINTS': 100,
-    'VEHICLE_UPDATE_INTERVAL': 30  # seconds
+    'VEHICLE_UPDATE_INTERVAL': 30,# seconds
+    'MAP_PROVIDER': 'mapbox',  # или 'osm', 'google'
+    'CACHE_ENABLED': True,
+    'DEFAULT_LANGUAGE': 'ru'
+}
+
+CITY_ROUTES_OPTIMIZATIONS = {
+    'ROUTE_CACHING': True,    # Кеширование маршрутов
+    'BATCH_PROCESSING': True, # Пакетная обработка
+    'PRELOAD_HOT_ROUTES': 10  # Предзагрузка топ-10 маршрутов
 }
 
 GOV_CONNECT_CONFIG = {

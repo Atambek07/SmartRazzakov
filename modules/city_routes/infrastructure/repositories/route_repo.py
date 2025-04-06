@@ -1,35 +1,34 @@
-from django.core.cache import caches
-from ..domain.entities import TransportRoute
-from .models import TransportRoute as RouteModel
+from abc import ABC, abstractmethod
+from typing import List, Optional
+from uuid import UUID
+from domain.entities import Route
+from domain.exceptions import RouteNotFoundError
 
+class RouteRepository(ABC):
+    """Абстрактный репозиторий для работы с маршрутами"""
+    
+    @abstractmethod
+    async def get_by_id(self, route_id: UUID) -> Route:
+        """Получить маршрут по ID"""
+        pass
 
-class DjangoRouteRepository:
-    def __init__(self):
-        self.cache = caches['routes']
+    @abstractmethod
+    async def save(self, route: Route) -> Route:
+        """Сохранить или обновить маршрут"""
+        pass
 
-    def get_available_routes(self, start: str, end: str) -> List[TransportRoute]:
-        cache_key = f"routes_{start}_{end}"
-        routes = self.cache.get(cache_key)
+    @abstractmethod
+    async def delete(self, route_id: UUID) -> None:
+        """Удалить маршрут"""
+        pass
 
-        if not routes:
-            routes = self._fetch_from_db(start, end)
-            self.cache.set(cache_key, routes, timeout=300)
-
-        return routes
-
-    def _fetch_from_db(self, start: str, end: str) -> List[TransportRoute]:
-        """Преобразует Django ORM модели в доменные entities"""
-        db_routes = RouteModel.objects.filter(
-            stops__dwithin=(start_point, 0.1)  # Пример пространственного запроса
-        ).select_related('vehicles')
-
-        return [
-            TransportRoute(
-                id=str(route.id),
-                transport_type=route.vehicle_type,
-                number=route.number,
-                stops=self._parse_stops(route.stops),
-                schedule=route.schedule,
-                current_location=self._get_latest_location(route.vehicles.all())
-            ) for route in db_routes
-        ]
+    @abstractmethod
+    async def find_by_criteria(
+        self,
+        start_point: Optional[tuple[float, float]] = None,
+        end_point: Optional[tuple[float, float]] = None,
+        transport_type: Optional[str] = None,
+        max_distance: Optional[float] = None
+    ) -> List[Route]:
+        """Поиск маршрутов по критериям"""
+        pass

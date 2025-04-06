@@ -1,38 +1,39 @@
-import requests
-from django.conf import settings
-from typing import Literal
+from twilio.rest import Client
+from domain.services.sms_service import SMSService
+from domain.exceptions import NotificationFailedError
+from domain.entities import UserPreferences
 
-SMSType = Literal['route_info', 'delay_alert', 'emergency']
+class TwilioSMSService(SMSService):
+    def __init__(self, account_sid: str, auth_token: str, from_number: str):
+        self.client = Client(account_sid, auth_token)
+        self.from_number = from_number
 
-
-class SMSGateway:
-    def __init__(self):
-        self.provider_url = settings.SMS_PROVIDER_URL
-        self.api_key = settings.SMS_API_KEY
-
-    def send_sms(self, phone: str, message_type: SMSType, data: dict) -> bool:
-        templates = {
-            'route_info': (
-                f"Маршрут {data['number']}: "
-                f"Следующая остановка {data['next_stop']}, "
-                f"Прибытие через {data['eta']} мин"
-            ),
-            'delay_alert': (
-                f"Внимание! Маршрут {data['number']} задерживается. "
-                f"Новое время прибытия: {data['new_time']}"
+    async def send(
+        self,
+        phone_number: str,
+        message: str,
+        user_prefs: Optional[UserPreferences] = None
+    ) -> bool:
+        try:
+            message = self.client.messages.create(
+                body=self._localize_message(message, user_prefs),
+                from_=self.from_number,
+                to=phone_number
             )
-        }
+            return message.status == 'delivered'
+        except Exception as e:
+            raise NotificationFailedError(f"Twilio error: {str(e)}")
 
-        payload = {
-            "phone": phone,
-            "text": templates[message_type],
-            "sender": "SmartRazakov"
-        }
+    def _localize_message(self, message: str, prefs: Optional[UserPreferences]) -> str:
+        # Логика локализации сообщения
+        return message
 
-        response = requests.post(
-            self.provider_url,
-            json=payload,
-            headers={"Authorization": f"Bearer {self.api_key}"}
-        )
+class KazInfoSMSService(SMSService):
+    """Интеграция с казахстанским SMS-провайдером"""
+    def __init__(self, api_login: str, api_password: str):
+        self.api_url = "https://kazinfoteh.org/api/send"
+        self.credentials = (api_login, api_password)
 
-        return response.status_code == 200
+    async def send(self, phone_number: str, message: str, **kwargs) -> bool:
+        # Реализация для казахстанского провайдера
+        pass

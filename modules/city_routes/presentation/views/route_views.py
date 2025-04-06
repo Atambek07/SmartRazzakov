@@ -1,48 +1,89 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from ..application.use_cases.route_finder import RouteFinderUseCase
-from ..infrastructure.repositories.django_route_repository import DjangoRouteRepository
+from rest_framework import status
+from django.contrib.gis.geos import Point
+from uuid import UUID
+from typing import Optional
+from ..serializers import (
+    RouteInputSerializer,
+    RouteOutputSerializer,
+    RouteUpdateSerializer
+)
+from infrastructure.repositories import DjangoRouteRepository
+from domain.exceptions import RouteNotFoundError, InvalidRouteError
 
+class RouteListView(APIView):
+    """API для работы с коллекцией маршрутов"""
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.repo = DjangoRouteRepository()
 
-class RouteAPIView(APIView):
-    """
-    API для поиска маршрутов между точками
-    Пример запроса:
-    GET /api/routes/?start=42.87,74.56&end=42.88,74.57&optimization=fastest
-    """
+    def post(self, request):
+        """Создание нового маршрута"""
+        serializer = RouteInputSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            route = self.repo.save(serializer.validated_data)
+            output = RouteOutputSerializer(route)
+            return Response(output.data, status=status.HTTP_201_CREATED)
+        except InvalidRouteError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
-        # Валидация параметров
-        start = request.query_params.get('start')
-        end = request.query_params.get('end')
-        optimization = request.query_params.get('optimization', 'fastest')
+        """Поиск маршрутов по параметрам"""
+        params = {
+            'start_point': request.query_params.get('start_point'),
+            'end_point': request.query_params.get('end_point'),
+            'transport_type': request.query_params.get('transport_type'),
+            'max_distance': request.query_params.get('max_distance')
+        }
+        
+        # Преобразование параметров
+        if params['start_point']:
+            params['start_point'] = [float(x) for x in params['start_point'].split(',')]
+        
+        routes = self.repo.find_by_criteria(**params)
+        serializer = RouteOutputSerializer(routes, many=True)
+        return Response(serializer.data)
 
-        if not start or not end:
-            return Response(
-                {"error": "Параметры start и end обязательны"},
-                status=400
-            )
+class RouteDetailView(APIView):
+    """API для работы с конкретным маршрутом"""
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.repo = DjangoRouteRepository()
 
+    def get(self, request, route_id: UUID):
+        """Получение деталей маршрута"""
         try:
-            # Преобразуем координаты из строки в кортеж float
-            start_coords = tuple(map(float, start.split(',')))
-            end_coords = tuple(map(float, end.split(',')))
+            route = self.repo.get_by_id(route_id)
+            serializer = RouteOutputSerializer(route)
+            return Response(serializer.data)
+        except RouteNotFoundError as e:
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-            # Инициализируем зависимости
-            repository = DjangoRouteRepository()
-            use_case = RouteFinderUseCase(repository)
+    def patch(self, request, route_id: UUID):
+        """Обновление маршрута"""
+        serializer = RouteUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            updated = self.repo.update(route_id, serializer.validated_data)
+            output = RouteOutputSerializer(updated)
+            return Response(output.data)
+        except RouteNotFoundError as e:
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except InvalidRouteError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Выполняем основной сценарий
-            route = use_case.execute(start_coords, end_coords, optimization)
-
-            return Response({
-                "route": route.number,
-                "stops": route.stops,
-                "estimated_time": route.estimated_time,
-                "price": route.price
-            })
-
-        except ValueError as e:
-            return Response({"error": str(e)}, status=400)
-        except Exception as e:
-            return Response({"error": "Внутренняя ошибка сервера"}, status=500)
+    def delete(self, request, route_id: UUID):
+        """Удаление маршрута"""
+        try:
+            self.repo.delete(route_id)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except RouteNotFoundError as e:
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
