@@ -1,9 +1,21 @@
 from django.urls import path
-from .presentation.views import StoryCreateView, StoryDetailView
+from . import views
+from drf_spectacular.views import SpectacularAPIView
 
 urlpatterns = [
-    path('stories/', StoryCreateView.as_view(), name='create-story'),
-    path('stories/<int:pk>/', StoryDetailView.as_view(), name='story-detail'),
-    path('qr/<int:story_id>/', QRCodeView.as_view(), name='qr-code'),
+    path(
+        'tales/scan/',
+        views.TaleContentView.as_view(),
+        name='tale-content'
+    ),
+    path(
+        'user/preferences/',
+        views.UserPreferenceView.as_view(),
+        name='user-preferences'
+    ),
+    path(
+        'schema/',
+        SpectacularAPIView.as_view(),
+        name='api-schema'
+    ),
 ]
-

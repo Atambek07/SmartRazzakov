@@ -51,16 +51,16 @@ INSTALLED_APPS = [
     'modules.city_routes',
     'django.contrib.gis',
     'modules.gov_connect',
-    'django.contrib.gis',
     'modules.feedback',
     'channels',
     'modules.feedback',
     'modules.hot_news',
     'modules.community_hub',
     'modules.city_routes',
-    'django.contrib.gis',
     'rest_framework',
     'city_routes.apps.CityRoutesConfig',
+    'city_tales.apps.CityTalesConfig',
+    'drf_spectacular',
 
 ]
 
@@ -154,6 +154,52 @@ STATIC_URL = 'static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+ADMIN_SITE_HEADER = "City Tales Administration"
+ADMIN_SITE_TITLE = "City Tales Admin Portal"
+
+
+
+MEDIA_PROCESSING = {
+    'VOSK_MODEL_PATH': os.path.join(BASE_DIR, 'models/vosk'),
+    'MAX_VIDEO_SIZE_MB': 500,
+    'DEFAULT_LANGUAGE': 'ru'
+}
+
+
+# Настройки сжатия и проверки целостности
+COMPRESSION_LEVEL = 6  # По умолчанию
+PREFERRED_HASH_ALGORITHM = 'sha256'  # Для проверки файлов
+
+
+OFFLINE_API_BASE_URL = 'https://api.citytales.example.com/v1'
+OFFLINE_CACHE_TIMEOUT = 60 * 60 * 24  # 24 часа
+API_KEY = 'your-secret-key'
+
+
+CACHES = {
+    'offline': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+        }
+    }
+}
+
+
+
+# Настройки обработки медиа
+AUDIO_BITRATE = '128k'  # Целевой битрейт аудио
+IMAGE_QUALITY = 85      # Качество сжатия изображений (1-100)
+OFFLINE_STORAGE = 'offline_packages'  # Папка для офлайн-пакетов
+QR_LOGO_PATH = os.path.join(BASE_DIR, 'static/logo.png')  # Для брендированных QR
+
+
+
+
+QR_BASE_URL = venv('QR_BASE_URL', default='https://yourdomain.com/api/v1')
 
 REST_FRAMEWORK = {
     # Authentication
@@ -325,3 +371,10 @@ LOGGING = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+QR_DEFAULT_PARAMS = {
+    'utm_source': 'qr_code',
+    'utm_medium': 'print',
+    'utm_campaign': 'city_tales'
+}
