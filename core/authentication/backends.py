@@ -36,3 +36,15 @@ class HybridAuthBackend(JWTAuthentication, OAuth2Authentication):
         if isinstance(validated_token, dict):  # JWT case
             return super(JWTAuthentication, self).get_user(validated_token)
         return validated_token.user  # OAuth case
+    
+
+class IsMedicalProfessional(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name='MedicalStaff').exists()
+
+class CanAccessMedicalRecord(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return (
+            request.user == obj.provider.user or 
+            request.user == obj.patient.user
+        )

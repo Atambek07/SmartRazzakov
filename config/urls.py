@@ -23,4 +23,5 @@ urlpatterns = [
     path('community/', include('modules.community_hub.urls')),
     path('api/edu-space/', include('modules.edu_space.presentation.urls')),
     path('api/feedback/', include('modules.feedback.presentation.urls')),
+    path('api/health/', include('modules.health_connect.presentation.urls')),
 ]
