@@ -1,5 +1,7 @@
 # modules/gov_connect/presentation/urls.py
 from fastapi import APIRouter
+
+from .views import emergency_views
 from .views import (
     citizen_router,
     municipal_router,
@@ -36,3 +38,10 @@ router.include_router(
 @router.get("/health")
 async def health_check():
     return {"status": "OK"}
+
+router = APIRouter()
+router.include_router(
+    emergency_views.router,
+    prefix="/emergency",
+    dependencies=[Depends(IsMunicipalWorker())]
+)

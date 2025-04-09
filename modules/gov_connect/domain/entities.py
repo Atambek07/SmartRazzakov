@@ -15,6 +15,12 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 from core.models.geo import Point
 
+from pydantic import BaseModel
+from typing import List, Optional
+from uuid import UUID, uuid4
+from datetime import datetime
+from enum import Enum
+
 class ComplaintStatus(str, Enum):
     NEW = 'new'
     IN_PROGRESS = 'in_progress'
@@ -95,3 +101,26 @@ class Document(BaseModel):
     complaint_id: Optional[UUID] = None
     file_url: str
     uploaded_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    
+class EmergencyAlertType(str, Enum):
+    DISASTER = "natural_disaster"
+    ACCIDENT = "major_accident"
+    SECURITY = "security_threat"
+    TEST = "test_alert"
+
+class EmergencyAlert(BaseModel):
+    id: UUID = uuid4()
+    message: str
+    alert_type: EmergencyAlertType
+    zones: List[str]  # Гео-JSON полигоны
+    channels: List[str]  # sms, email, sirens, mobile_push
+    created_at: datetime = datetime.utcnow()
+    status: str = "pending"
+
+class EmergencyZone(BaseModel):
+    id: UUID = uuid4()
+    name: str
+    geojson: dict  # Геометрия зоны
+    population: int
+    priority: int

@@ -53,14 +53,13 @@ INSTALLED_APPS = [
     'modules.gov_connect',
     'modules.feedback',
     'channels',
-    'modules.feedback',
     'modules.hot_news',
     'modules.community_hub',
-    'modules.city_routes',
     'rest_framework',
     'city_routes.apps.CityRoutesConfig',
     'city_tales.apps.CityTalesConfig',
     'drf_spectacular',
+    'modules.gov_connect.apps.GovConnectConfig',
 
 ]
 
