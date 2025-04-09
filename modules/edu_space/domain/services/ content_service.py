@@ -1,32 +1,36 @@
-from .entities import EducationalContent, ContentType
-from .exceptions import InvalidContentError
+from abc import ABC, abstractmethod
+from uuid import UUID
+from ..entities import EducationalContent
+from ..exceptions import ContentValidationError, ContentPublishingError
 
+class ContentService(ABC):
+    @abstractmethod
+    def upload_content(self, content_data: dict) -> EducationalContent:
+        """Загружает новый образовательный контент"""
+        pass
 
-class ContentValidator:
-    @staticmethod
-    def validate(content_data: dict) -> ContentType:
-        """Проверяет корректность образовательного контента"""
-        if not content_data.get('source'):
-            raise InvalidContentError("Content source is required")
+    @abstractmethod
+    def publish_content(self, content_id: UUID):
+        """Публикует контент для общего доступа"""
+        pass
 
-        if content_data['type'] == 'video' and not content_data.get('duration'):
-            raise InvalidContentError("Video content requires duration")
+    @abstractmethod
+    def generate_interactive_test(self, content_id: UUID) -> dict:
+        """Генерирует интерактивный тест на основе контента"""
+        pass
 
-        return ContentType(content_data['type'])
+class BaseContentService(ContentService):
+    def __init__(self, content_repository):
+        self.content_repo = content_repository
 
-
-class ContentService:
-    def create_content(self, content_data: dict, author_id: str) -> EducationalContent:
-        """Создает новый образовательный материал"""
-        content_type = ContentValidator.validate(content_data)
-
-        return EducationalContent(
-            id=None,
-            title=content_data['title'],
-            content_type=content_type,
-            difficulty=content_data.get('difficulty', DifficultyLevel.BEGINNER),
-            subject=content_data['subject'],
-            author_id=author_id,
-            created_at=datetime.now(),
-            metadata=content_data.get('metadata', {})
-        )
+    def publish_content(self, content_id: UUID):
+        content = self.content_repo.get_by_id(content_id)
+        
+        if not content.file_url:
+            raise ContentPublishingError("Content must have a file to publish")
+            
+        if content.is_published:
+            raise ContentPublishingError("Content already published")
+            
+        content.is_published = True
+        return self.content_repo.save(content)
