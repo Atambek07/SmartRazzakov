@@ -198,8 +198,25 @@ QR_LOGO_PATH = os.path.join(BASE_DIR, 'static/logo.png')  # Для бренди�
 
 
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
+}
 
-QR_BASE_URL = venv('QR_BASE_URL', default='https://yourdomain.com/api/v1')
+
+
+
+ELASTIC_CONFIG = {
+    "hosts": ["http://elasticsearch:9200"],
+    "community_index": "communities",
+    "event_index": "events",
+    "user_index": "users"
+}
+
 
 REST_FRAMEWORK = {
     # Authentication
