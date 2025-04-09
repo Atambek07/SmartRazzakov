@@ -1,3 +1,4 @@
+
 from abc import ABC, abstractmethod
 from uuid import UUID
 from ..entities import EducationalContent

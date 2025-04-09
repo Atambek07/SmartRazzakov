@@ -16,7 +16,7 @@ class BasePaymentGateway(ABC):
     async def create_payment_intent(
         self, 
         amount: float,
-        currency: str = "KZT",
+        currency: str = "KGZ",
         metadata: Optional[Dict] = None
     ) -> Dict:
         pass
@@ -30,7 +30,7 @@ class StripeGateway(BasePaymentGateway):
         stripe.api_key = settings.STRIPE_API_KEY
         self.client = stripe
 
-    async def create_payment_intent(self, amount, currency="KZT", metadata=None):
+    async def create_payment_intent(self, amount, currency="KGZ", metadata=None):
         try:
             intent = self.client.PaymentIntent.create(
                 amount=int(amount * 100),
@@ -65,7 +65,7 @@ class PayPalGateway(BasePaymentGateway):
             "client_secret": settings.PAYPAL_SECRET
         })
 
-    async def create_payment_intent(self, amount, currency="KZT", metadata=None):
+    async def create_payment_intent(self, amount, currency="KGZ", metadata=None):
         payment = paypalrestsdk.Payment({
             "intent": "sale",
             "payer": {"payment_method": "paypal"},

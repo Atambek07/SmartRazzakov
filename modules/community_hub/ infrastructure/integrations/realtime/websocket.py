@@ -1,40 +1,85 @@
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.core.serializers.json import DjangoJSONEncoder
+# modules/community_hub/infrastructure/integrations/realtime/websocket.py
+import json
+from typing import Dict, Any, Optional, Callable
+from uuid import UUID
+from .. import BaseRealtimeClient, RealtimeConnectionError
+from websockets.client import connect as ws_connect
+from websockets.exceptions import ConnectionClosed
 
+class CommunityWebSocketClient(BaseRealtimeClient):
+    def __init__(self, endpoint: str, token: str):
+        self.endpoint = endpoint
+        self.token = token
+        self._ws = None
+        self._message_handlers: Dict[str, Callable] = {}
+        self._is_active = False
 
-class CommunityChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
-        self.community_id = self.scope['url_route']['kwargs']['community_id']
-        self.group_name = f'community_{self.community_id}'
+        if self.is_connected:
+            return
 
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name
-        )
-        await self.accept()
-
-    async def receive_json(self, content, **kwargs):
-        """Обрабатывает входящие сообщения"""
-        message_type = content.get('type')
-
-        if message_type == 'chat_message':
-            await self.channel_layer.group_send(
-                self.group_name,
-                {
-                    'type': 'chat.message',
-                    'message': content['message'],
-                    'sender': content['sender']
-                }
+        try:
+            self._ws = await ws_connect(
+                f"{self.endpoint}?token={self.token}",
+                ping_interval=30,
+                ping_timeout=90
             )
+            self._is_active = True
+            asyncio.create_task(self._listen_messages())
+        except Exception as e:
+            raise RealtimeConnectionError(
+                f"WebSocket connection failed: {str(e)}"
+            ) from e
 
-    async def chat_message(self, event):
-        """Отправляет сообщение всем участникам группы"""
-        await self.send_json(
-            {
-                'type': 'chat.message',
-                'message': event['message'],
-                'sender': event['sender'],
-                'timestamp': datetime.now().isoformat()
-            },
-            cls=DjangoJSONEncoder
-        )
+    async def _listen_messages(self):
+        while self._is_active and self._ws:
+            try:
+                message = await self._ws.recv()
+                await self._handle_message(message)
+            except ConnectionClosed:
+                self._is_active = False
+                await self.connect()
+
+    async def _handle_message(self, raw_message: str):
+        try:
+            message = json.loads(raw_message)
+            handler = self._message_handlers.get(message.get('type'))
+            if handler:
+                await handler(message)
+        except json.JSONDecodeError:
+            print(f"Invalid JSON message: {raw_message}")
+
+    def register_handler(self, message_type: str, handler: Callable):
+        self._message_handlers[message_type] = handler
+
+    async def send_message(self, message: Dict[str, Any]):
+        if not self.is_connected:
+            await self.connect()
+
+        try:
+            await self._ws.send(json.dumps(message))
+        except ConnectionClosed:
+            await self.connect()
+            await self._ws.send(json.dumps(message))
+
+    async def join_community_room(self, community_id: UUID):
+        await self.send_message({
+            "type": "join",
+            "room": f"community_{community_id}"
+        })
+
+    async def leave_room(self, room: str):
+        await self.send_message({
+            "type": "leave",
+            "room": room
+        })
+
+    @property
+    def is_connected(self) -> bool:
+        return self._ws is not None and not self._ws.closed
+
+    async def disconnect(self):
+        self._is_active = False
+        if self._ws:
+            await self._ws.close()
+            self._ws = None

@@ -1,17 +1,33 @@
-from django.urls import path
+# modules/community_hub/urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .presentation.views import (
-    CommunityAPI,
-    CommunityDetailAPI,
-    CommunityChatAPI
+    CommunityViewSet,
+    EventViewSet,
+    ModerationViewSet
 )
-from .presentation.consumers import CommunityChatConsumer
+
+router = DefaultRouter()
+router.register(r'communities', CommunityViewSet, basename='community')
+router.register(
+    r'communities/(?P<community_id>[^/.]+)/events',
+    EventViewSet,
+    basename='community-event'
+)
+router.register(
+    r'communities/(?P<community_id>[^/.]+)/moderation',
+    ModerationViewSet,
+    basename='community-moderation'
+)
 
 websocket_urlpatterns = [
-    path('ws/communities/<int:community_id>/', CommunityChatConsumer.as_asgi()),
+    path(
+        'ws/communities/<uuid:community_id>/chat/',
+        ChatConsumer.as_asgi()
+    ),
 ]
 
 urlpatterns = [
-    path('communities/', CommunityAPI.as_view(), name='community-list'),
-    path('communities/<int:pk>/', CommunityDetailAPI.as_view(), name='community-detail'),
-    path('communities/<int:pk>/chat/', CommunityChatAPI.as_view(), name='community-chat'),
+    path('api/', include(router.urls)),
+    path('api/ws/', include(websocket_urlpatterns)),
 ]
