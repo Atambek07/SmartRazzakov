@@ -11,7 +11,7 @@ requests~=2.31.0
 #######################################
 ### Core Application Dependencies [MUST]
 #######################################
-Django==4.2.10  # LTS version with long-term support
+Django==4.2.20  # LTS version with long-term support
 djangorestframework==3.14.0  # API framework
 python-dotenv==1.0.0  # Environment management
 psycopg2==2.9.9  # PostgreSQL adapter (production-grade)
