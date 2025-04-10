@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'city_tales.apps.CityTalesConfig',
     'drf_spectacular',
     'modules.gov_connect.apps.GovConnectConfig',
+    'modules.made_in_leylek.made_in_leylek.apps.MadeInLeylekConfig',
 
 ]
 

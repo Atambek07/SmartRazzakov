@@ -1,0 +1,625 @@
+.
+├── auto_push.py
+├── config
+│   ├── asgi.py
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── core
+│   ├── api
+│   │   ├── exceptions.py
+│   │   ├── pagination.py
+│   │   └── throttling.py
+│   ├── authentication
+│   │   ├── backends.py
+│   │   ├── __init__.py
+│   │   ├── permissions.py
+│   │   ├── serializers.py
+│   │   └── tokens.py
+│   ├── __init__.py
+│   ├── logging.py
+│   ├── management
+│   │   ├── commands
+│   │   │   ├── create_service_user.py
+│   │   │   ├── generate_jwt_key.py
+│   │   │   ├── init_postgis.py
+│   │   │   └── __init__.py
+│   │   └── __init__.py
+│   ├── middleware
+│   │   ├── analytics.py
+│   │   ├── auth.py
+│   │   ├── error_handling.py
+│   │   └── __init__.py
+│   ├── models
+│   │   ├── base.py
+│   │   └── __init__.py
+│   └── utils
+│       ├── __init__.py
+│       ├── logging.py
+│       ├── pagination.py
+│       ├── responses.py
+│       ├── throttling.py
+│       └── validators.py
+├── git_cheatsheet.md
+├── .github
+│   └── workflows
+│       ├── django.yml
+│       └── qodana_code_quality.yml
+├── manage.py
+├── modules
+│   ├── city_routes
+│   │   ├── admin.py
+│   │   ├──  application
+│   │   │   ├──  dto
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── route_dto.py
+│   │   │   │   ├── traffic_dto.py
+│   │   │   │   └── weather_dto.py
+│   │   │   ├── __init__.py
+│   │   │   ├── mappers.py
+│   │   │   └──  use_cases
+│   │   │       ├── advanced_routing.py
+│   │   │       ├── __init__.py
+│   │   │       ├── route_finder.py
+│   │   │       ├── route_planning.py
+│   │   │       ├── traffic_management.py
+│   │   │       └── user_notifications.py
+│   │   ├── apps.py
+│   │   ├──  domain
+│   │   │   ├── entities.py
+│   │   │   ├── exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   └── services
+│   │   │       ├── __init__.py
+│   │   │       ├── route_optimizer.py
+│   │   │       ├── route_planner.py
+│   │   │       ├── sms_service.py
+│   │   │       ├── traffic_service.py
+│   │   │       └── weather_service.py
+│   │   ├── infrastructure
+│   │   │   ├── __init__.py
+│   │   │   ├── integrations
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── map_provider.py
+│   │   │   │   ├── osm_adapter.py
+│   │   │   │   ├── sms_service.py
+│   │   │   │   ├── vehicle_tracking.py
+│   │   │   │   └── weather_providers.py
+│   │   │   ├── models
+│   │   │   │   ├── gis.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── route_model.py
+│   │   │   │   └──  transport.py
+│   │   │   └── repositories
+│   │   │       ├── django_route_repository.py
+│   │   │       ├── __init__.py
+│   │   │       ├── route_repo.py
+│   │   │       └── transport_repo.py
+│   │   ├── __init__.py
+│   │   └── presentation
+│   │       ├── fastapi_urls.py
+│   │       ├── __init__.py
+│   │       ├── serializers
+│   │       │   ├── __init__.py
+│   │       │   ├── route_serializers.py
+│   │       │   └── transport_serializers.py
+│   │       ├── templates
+│   │       │   └── city_routes
+│   │       │       ├── base.html
+│   │       │       ├── route_create.html
+│   │       │       ├── route_detail.html
+│   │       │       ├── route_list.html
+│   │       │       ├── traffic_alerts.html
+│   │       │       └── transport_map.html
+│   │       ├── urls.py
+│   │       └── views
+│   │           ├── events_api.py
+│   │           ├── __init__.py
+│   │           ├── parking_api.py
+│   │           ├── public_api.py
+│   │           ├── route_views.py
+│   │           ├── traffic_views.py
+│   │           └── weather_api.py
+│   ├── city_tales
+│   │   ├── admin.py
+│   │   ├── application
+│   │   │   ├── dto.py
+│   │   │   ├── __init__.py
+│   │   │   ├── mappers.py
+│   │   │   └── use_cases.py
+│   │   ├── apps.py
+│   │   ├── domain
+│   │   │   ├── entities.py
+│   │   │   ├── exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   └── services.py
+│   │   ├── geoservices
+│   │   │   ├──  distance_calculator.py
+│   │   │   ├──  elevation.py
+│   │   │   ├── geo_fences.py
+│   │   │   ├── __init__.py
+│   │   │   └── route_planner.py
+│   │   ├── infrastructure
+│   │   │   ├── analytics.py
+│   │   │   ├── audio_processing.py
+│   │   │   ├── image_optimizer.py
+│   │   │   ├── __init__.py
+│   │   │   ├── media_processing
+│   │   │   │   ├── 3d_model_processor.py
+│   │   │   │   ├── exceptions.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── subtitle_generator.py
+│   │   │   │   ├── text_processor.py
+│   │   │   │   ├── utils.py
+│   │   │   │   └── video_converter.py
+│   │   │   ├── models.py
+│   │   │   ├── offline_generator.py
+│   │   │   ├── qr_generator.py
+│   │   │   ├── qr_service.py
+│   │   │   ├── repositories.py
+│   │   │   └── storage.py
+│   │   ├── __init__.py
+│   │   ├── offline
+│   │   │   ├── asset_manager.py
+│   │   │   ├── cache_manager.py
+│   │   │   ├── conflict_resolver.py
+│   │   │   ├── data_sync.py
+│   │   │   ├── __init__.py
+│   │   │   ├── state_manager.py
+│   │   │   ├── task_queue.py
+│   │   │   └── utils
+│   │   │       ├── checksum.py
+│   │   │       ├── compression.py
+│   │   │       └── __init__.py
+│   │   ├── presentation
+│   │   │   ├── __init__.py
+│   │   │   ├── serializers.py
+│   │   │   ├── templates
+│   │   │   │   └── city_tales
+│   │   │   │       ├── qr_display.html 
+│   │   │   │       └── story_detail.html
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   └── signals.py
+│   ├── community_hub
+│   │   ├──  admin.py
+│   │   ├── application
+│   │   │   ├── dto
+│   │   │   │   ├── chat_dto.py
+│   │   │   │   ├── community_dto.py
+│   │   │   │   ├── event_dto.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── member_dto.py
+│   │   │   │   ├── response_dto.py
+│   │   │   │   └── system_dto.py
+│   │   │   ├── __init__.py
+│   │   │   └── use_cases
+│   │   │       ├──  community_management.py
+│   │   │       ├── content_moderation.py
+│   │   │       ├── event_management.py
+│   │   │       └── __init__.py
+│   │   ├── apps.py
+│   │   ├──  domain
+│   │   │   ├──  entities.py
+│   │   │   ├── exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   └── services
+│   │   │       ├── community_service.py
+│   │   │       ├── event_service.py
+│   │   │       ├── __init__.py
+│   │   │       └── moderation_service.py
+│   │   ├──  infrastructure
+│   │   │   ├── __init__.py
+│   │   │   ├── integrations
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── realtime
+│   │   │   │   │   ├── firebase.py
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── notifications.py
+│   │   │   │   │   └── websocket.py
+│   │   │   │   └── search
+│   │   │   │       ├── elastic.py
+│   │   │   │       ├── __init__.py
+│   │   │   │       └── tag_engine.py
+│   │   │   ├── models
+│   │   │   │   ├── communities.py
+│   │   │   │   ├── events.py
+│   │   │   │   └── __init__.py
+│   │   │   └── repositories
+│   │   │       ├── community_repo.py
+│   │   │       ├── event_repo.py
+│   │   │       ├── __init__.py
+│   │   │       └── member_repo.py
+│   │   ├── __init__.py
+│   │   ├── mappers.py
+│   │   ├── presentation
+│   │   │   ├── consumers
+│   │   │   │   ├── chat_consumer.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── __init__.py
+│   │   │   ├── routing.py
+│   │   │   ├── serializers
+│   │   │   │   ├── community_serializers.py
+│   │   │   │   ├── event_serializers.py
+│   │   │   │   └── __init__.py
+│   │   │   └── views
+│   │   │       ├──  community_views.py
+│   │   │       ├── event_views.py
+│   │   │       ├── __init__.py
+│   │   │       └── moderation_views.py
+│   │   ├── templates
+│   │   │   └── community_hub
+│   │   │       ├── event_calendar.html
+│   │   │       └──  group_detail.html
+│   │   └── urls.py
+│   ├── edu_space
+│   │   ├── admin.py
+│   │   ├── application
+│   │   │   ├──  dto
+│   │   │   │   ├── classroom_dto.py
+│   │   │   │   ├── content_dto.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── __init__.py
+│   │   │   ├── mappers.py
+│   │   │   └──  use_cases
+│   │   │       ├── classroom_operations.py
+│   │   │       ├── content_management.py
+│   │   │       ├── __init__.py
+│   │   │       └── tutor_matching.py
+│   │   ├── apps.py
+│   │   ├── domain
+│   │   │   ├── entities.py
+│   │   │   ├── exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   └── services
+│   │   │       ├── classroom_service.py
+│   │   │       ├──  content_service.py
+│   │   │       ├── __init__.py
+│   │   │       └── tutor_service.py
+│   │   ├── infrastructure
+│   │   │   ├── __init__.py
+│   │   │   ├── integrations
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── payment_gateway.py
+│   │   │   │   └── video_conferencing.py
+│   │   │   ├── models
+│   │   │   │   ├── educational.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── user_profiles.py
+│   │   │   └── repositories
+│   │   │       ├── content_repo.py
+│   │   │       ├── __init__.py
+│   │   │       └── user_repo.py
+│   │   ├── __init__.py
+│   │   └── presentation
+│   │       ├── __init__.py
+│   │       ├── serializers
+│   │       │   ├── content_serializers.py
+│   │       │   ├── __init__.py
+│   │       │   └──  user_serializers.py
+│   │       ├── templates
+│   │       │   └── edu_space
+│   │       │       ├── course_detail.html
+│   │       │       └──  virtual_class.html
+│   │       ├── urls.py
+│   │       └── views
+│   │           ├── classroom_views.py
+│   │           ├── content_views.py
+│   │           ├── __init__.py
+│   │           └── tutor_views.py
+│   ├── feedback
+│   │   ├── admin.py
+│   │   ├── application
+│   │   │   ├── dto
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── rating_dto.py
+│   │   │   │   └── review_dto.py
+│   │   │   ├── __init__.py
+│   │   │   └──  use_cases
+│   │   │       ├── feedback_moderation.py
+│   │   │       ├── __init__.py
+│   │   │       ├── rating_calculation.py
+│   │   │       └── review_management.py
+│   │   ├── apps.py
+│   │   ├──  domain
+│   │   │   ├── entities.py
+│   │   │   ├──  exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   └──  services
+│   │   │       ├── __init__.py
+│   │   │       ├── rating_service.py
+│   │   │       ├── review_service.py
+│   │   │       └── sentiment_analysis.py
+│   │   ├── infrastructure
+│   │   │   ├── __init__.py
+│   │   │   ├── integrations
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├──  moderation
+│   │   │   │   │   ├── ai_moderation.py
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── manual_moderation.py
+│   │   │   │   │   ├── profanity_filter.py
+│   │   │   │   │   └── spam_detector.py
+│   │   │   │   └── notifications
+│   │   │   │       ├── email.py
+│   │   │   │       ├── __init__.py
+│   │   │   │       ├── push.py
+│   │   │   │       └── sms.py
+│   │   │   ├── models
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── ratings.py
+│   │   │   │   └── reviews.py
+│   │   │   └── repositories
+│   │   │       ├── __init__.py
+│   │   │       ├── rating_repo.py
+│   │   │       └── review_repo.py
+│   │   ├── __init__.py
+│   │   ├── mappers.py
+│   │   └── presentation
+│   │       ├── __init__.py
+│   │       ├──  serializers
+│   │       │   ├── __init__.py
+│   │       │   ├── rating_serializers.py
+│   │       │   └── review_serializers.py
+│   │       ├── templates
+│   │       │   └── feedback
+│   │       │       ├── rating_display.html
+│   │       │       └── review_form..html
+│   │       ├── urls.py
+│   │       └── views
+│   │           ├── business_feedback.py
+│   │           ├── __init__.py
+│   │           ├── moderation_views.py
+│   │           └── public_views.py
+│   ├── gov_connect
+│   │   ├── admin.py
+│   │   ├── application
+│   │   │   ├── dto
+│   │   │   │   ├──  booking_dto.py
+│   │   │   │   ├── complaint_dto.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── __init__.py
+│   │   │   └── use_cases
+│   │   │       ├── complaint_processing.py
+│   │   │       ├── emergency_broadcast.py
+│   │   │       ├── __init__.py
+│   │   │       ├── service_booking.py
+│   │   │       └── voting.py
+│   │   ├── apps.py
+│   │   ├── domain
+│   │   │   ├── entities.py
+│   │   │   ├── exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   └── services
+│   │   │       ├── complaint_service.py
+│   │   │       ├── document_service.py
+│   │   │       ├── emergency_service.py
+│   │   │       ├── __init__.py
+│   │   │       └── workflow_engine.py
+│   │   ├── infrastructure
+│   │   │   ├── __init__.py
+│   │   │   ├── integrations
+│   │   │   │   ├──  document_parser.py
+│   │   │   │   ├── emergency_channels.py
+│   │   │   │   ├── gis_integration.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── notification_system.py
+│   │   │   ├──  models
+│   │   │   │   ├── complaints.py
+│   │   │   │   ├── emergency.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── services.py
+│   │   │   └── repositories
+│   │   │       ├── complaint_repo.py
+│   │   │       ├── emergency_repo.py
+│   │   │       ├── __init__.py
+│   │   │       └── service_repo.py
+│   │   ├── __init__.py
+│   │   └── presentation
+│   │       ├── __init__.py
+│   │       ├── serializers
+│   │       │   ├──  complaint_serializers.py
+│   │       │   ├── __init__.py
+│   │       │   └── service_serializers.py
+│   │       ├──  templates
+│   │       │   └── gov_connect
+│   │       │       ├──  complaint_form.html
+│   │       │       └── service_booking.html
+│   │       ├── urls.py
+│   │       └── views
+│   │           ├──  citizen_views.py
+│   │           ├── emergency_views.py
+│   │           ├── __init__.py
+│   │           ├──  municipal_views.py
+│   │           └── public_dashboard.py
+│   ├── health_connect
+│   │   ├──  admin.py
+│   │   ├── application
+│   │   │   ├──  dto
+│   │   │   │   ├──  appointment_dto.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   └──  medical_dto.py
+│   │   │   ├── __init__.py
+│   │   │   ├── mappers.py
+│   │   │   └── use_cases
+│   │   │       ├── appointment_management.py
+│   │   │       ├── emergency_services.py
+│   │   │       ├── __init__.py
+│   │   │       └── medical_records.py
+│   │   ├── apps.py
+│   │   ├──  domain
+│   │   │   ├── entities.py
+│   │   │   ├──  exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   └──  services
+│   │   │       ├──  appointment_service.py
+│   │   │       ├── __init__.py
+│   │   │       ├── medical_data.py
+│   │   │       └── telemedicine.py
+│   │   ├── infrastructure
+│   │   │   ├── __init__.py
+│   │   │   ├── integrations
+│   │   │   │   ├── hl7
+│   │   │   │   │   ├── fhir_adapter.py
+│   │   │   │   │   ├──  hl7_parser.py
+│   │   │   │   │   └── __init__.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── telemedicine
+│   │   │   │       ├── __init__.py
+│   │   │   │       ├── video_provider.py
+│   │   │   │       └── webrtc_handler.py
+│   │   │   ├── models
+│   │   │   │   ├── audit.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── medical.py
+│   │   │   │   └── users.py
+│   │   │   └── repositories
+│   │   │       ├── __init__.py
+│   │   │       ├──  medical_repo.py
+│   │   │       └── user_repo.py
+│   │   ├── __init__.py
+│   │   └── presentation
+│   │       ├── __init__.py
+│   │       ├── serializers
+│   │       │   ├── appointment_serializers.py
+│   │       │   ├── __init__.py
+│   │       │   └── medical_serializers.py
+│   │       ├──  templates
+│   │       │   └── health_connect
+│   │       │       ├──  medical_card.html
+│   │       │       └── video_consult.html
+│   │       ├──  urls.py
+│   │       └── views
+│   │           ├── doctor_views.py
+│   │           ├── emergency_views.py
+│   │           ├── __init__.py
+│   │           └── patient_views.py
+│   ├── hot_news
+│   │   ├── admin.py
+│   │   ├── application
+│   │   │   ├── dto
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── news_dto.py
+│   │   │   │   └── subscription_dto.py
+│   │   │   ├── __init__.py
+│   │   │   ├── mappers.py
+│   │   │   └── use_cases
+│   │   │       ├── emergency_alert.py
+│   │   │       ├── __init__.py
+│   │   │       ├──  news_management.py
+│   │   │       └── subscription_management.py
+│   │   ├── apps.py
+│   │   ├── domain
+│   │   │   ├── entities.py
+│   │   │   ├── exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   └── services
+│   │   │       ├── aggregation_service.py
+│   │   │       ├── emergency_service.py
+│   │   │       ├── __init__.py
+│   │   │       └── news_service.py
+│   │   ├── infrastructure
+│   │   │   ├── __init__.py
+│   │   │   ├── integrations
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── rss
+│   │   │   │       ├── feed_manager.py
+│   │   │   │       ├── __init__.py
+│   │   │   │       └── rss_parser.py
+│   │   │   ├── models
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├──  news.py
+│   │   │   │   └── subscriptions.py
+│   │   │   ├── notifications
+│   │   │   │   ├── base_notifier.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── push_notifier.py
+│   │   │   │   └── sms_notifier.py
+│   │   │   └── repositories
+│   │   │       ├── __init__.py
+│   │   │       ├── news_repo.py
+│   │   │       └── subscription_repo.py
+│   │   ├── __init__.py
+│   │   └── presentation
+│   │       ├── __init__.py
+│   │       ├── serializers
+│   │       │   ├── __init__.py
+│   │       │   ├──  news_serializers.py
+│   │       │   └── subscription_serializers.py
+│   │       ├── templates
+│   │       │   └── hot_news
+│   │       │       ├── alert_notification.html
+│   │       │       └──  news_detail.html
+│   │       ├── urls.py
+│   │       └── views
+│   │           ├── emergency_views.py
+│   │           ├── __init__.py
+│   │           ├── news_views.py
+│   │           └── subscription_views.py
+│   ├── __init__.py
+│   └── made_in_leylek
+│       ├──  admin.py
+│       ├── application
+│       │   ├──  dto
+│       │   │   ├── __init__.py
+│       │   │   ├── order_dto.py
+│       │   │   └── product_dto.py
+│       │   ├── __init__.py
+│       │   ├── mappers.py
+│       │   └── use_cases
+│       │       ├── group_purchases.py
+│       │       ├── __init__.py
+│       │       ├── order_processing.py
+│       │       └──  product_management.py
+│       ├── apps.py
+│       ├── domain
+│       │   ├── entities.py
+│       │   ├── exceptions.py
+│       │   ├── __init__.py
+│       │   └── services
+│       │       ├──  auction.py
+│       │       ├── __init__.py
+│       │       ├──  logistics.py
+│       │       └──  marketplace.py
+│       ├── infrastructure
+│       │   ├── __init__.py
+│       │   ├── models
+│       │   │   ├── __init__.py
+│       │   │   ├── orders.py
+│       │   │   └── products.py
+│       │   └── repositories
+│       │       ├── __init__.py
+│       │       ├── integrations
+│       │       │   ├── delivery
+│       │       │   │   ├── courier.py
+│       │       │   │   ├── __init__.py
+│       │       │   │   └── pickup_points.py
+│       │       │   ├── __init__.py
+│       │       │   └── payment
+│       │       │       ├── __init__.py
+│       │       │       ├── local_bank.py
+│       │       │       └── stripe_adapter.py
+│       │       ├── order_repo.py
+│       │       └── product_repo.py
+│       ├── __init__.py
+│       └──  presentation
+│           ├── __init__.py
+│           ├──  serializers
+│           │   ├── __init__.py
+│           │   ├── order_serializers.py
+│           │   └── product_serializers.py
+│           ├──  templates
+│           │   └── made_in_leylek
+│           │       ├── order_tracking.html
+│           │       └── product_detail.html
+│           ├── urls.py
+│           └── views
+│               ├── auction_views.py
+│               ├──  buyer_views.py
+│               ├── __init__.py
+│               └── seller_views.py
+├── project_structure.txt
+├── qodana.yaml
+├── README.md
+├── requirements.txt
